@@ -132,7 +132,7 @@ Rectangle {
                 border.color: root.cBorder; border.width: 1
                 Text {
                     anchors.centerIn: parent
-                    text: "👤"; font.pixelSize: 24
+                    text: "●"; font.pixelSize: 24; color: root.cAccent
                 }
             }
 

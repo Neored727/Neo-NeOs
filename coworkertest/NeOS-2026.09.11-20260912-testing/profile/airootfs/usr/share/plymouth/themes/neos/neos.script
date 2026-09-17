@@ -1,0 +1,50 @@
+# NeOS Plymouth boot splash (script module) — a single still cat centered on
+# a dark background. No wordmark, no tagline, no dots, no status text, no
+# animation — just the cat.
+#
+# Frame source images (cat-NN.png) are generated from tools/loader-cat.gif by
+# tools/gen-bootlogo-frames.py and committed; only cat-00.png is used here.
+
+# --- Background: deep navy gradient (#0A0E1A -> #16203A) ---
+Window.SetBackgroundTopColor(0.039, 0.055, 0.102);
+Window.SetBackgroundBottomColor(0.086, 0.125, 0.227);
+
+# --- Load the still cat image ---
+cat_image = Image("cat-00.png");
+cat.width  = cat_image.GetWidth();
+cat.height = cat_image.GetHeight();
+
+center_x = Window.GetX() + Window.GetWidth() / 2;
+center_y = Window.GetY() + Window.GetHeight() / 2;
+
+cat_x = center_x - cat.width / 2;
+cat_y = center_y - cat.height / 2;
+
+# --- Cat sprite (static, no refresh callback) ---
+cat.sprite = Sprite();
+cat.sprite.SetImage(cat_image);
+cat.sprite.SetX(cat_x);
+cat.sprite.SetY(cat_y);
+cat.sprite.SetZ(10);
+
+# --- Password prompt for encrypted disks ---
+prompt_sprite = Sprite();
+fun display_password_callback(prompt, bullets) {
+    bullet_text = "";
+    i = 0;
+    while (i < bullets) {
+        bullet_text += "*";
+        i++;
+    }
+    txt = Image.Text(prompt + "   " + bullet_text, 0.90, 0.91, 0.95);
+    prompt_sprite.SetImage(txt);
+    prompt_sprite.SetX(Window.GetX() + Window.GetWidth() / 2 - txt.GetWidth() / 2);
+    prompt_sprite.SetY(cat_y + cat.height + 24);
+    prompt_sprite.SetZ(20);
+}
+Plymouth.SetDisplayPasswordFunction(display_password_callback);
+
+fun display_normal_callback() {
+    prompt_sprite.SetImage(Image.Text(""));
+}
+Plymouth.SetDisplayNormalFunction(display_normal_callback);

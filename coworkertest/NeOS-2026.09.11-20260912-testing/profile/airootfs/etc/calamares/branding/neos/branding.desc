@@ -1,0 +1,53 @@
+---
+componentName:  neos
+
+welcomeStyleCalamares:   false
+welcomeExpandingLogo:    true
+windowResizable:         true
+windowSize:              1024,720
+windowCentered:          true
+windowPlacement:         center
+
+# Traditional widget sidebar (progress) + bottom navigation buttons.
+sidebar:    widget
+navigation: widget
+
+strings:
+    productName:         NeOS
+    shortProductName:    NeOS
+    productVersion:      2026.07
+    shortProductVersion: 2026.07
+    versionedName:       NeOS 2026.07
+    shortVersionedName:  NeOS 2026.07
+    bootloaderEntryName: NeOS
+    # URLs for the welcome-page info buttons. Calamares reads the URLs from here;
+    # welcome.conf's show*Url booleans decide which buttons appear. Without these
+    # the welcome page rendered with no support/known-issues/release-notes links.
+    productUrl:          "https://github.com/NimuthuGanegoda/NeOS"
+    supportUrl:          "https://github.com/NimuthuGanegoda/NeOS/issues"
+    knownIssuesUrl:      "https://github.com/NimuthuGanegoda/NeOS/issues"
+    releaseNotesUrl:     "https://github.com/NimuthuGanegoda/NeOS/blob/main/CHANGELOG.md"
+
+images:
+    productLogo:         "logo.png"
+    productIcon:         "logo.png"
+    productWelcome:      "welcome.png"
+
+slideshow:               "show.qml"
+slideshowAPI:            2
+
+# NeOS brand palette — single source of truth: tools/palette.json.
+# NOTE: current Calamares uses the CAPITALISED Sidebar* keys; the old lowercase
+# sidebarBackground/sidebarTextHighlight names are ignored, so the previous theming
+# never applied. The current step gets an accent-blue background with white text.
+style:
+   SidebarBackground:        "#0A0E1A"
+   SidebarText:              "#AEB4C7"
+   SidebarBackgroundCurrent: "#1F6FD6"
+   SidebarTextCurrent:       "#FFFFFF"
+
+# Let users upload installer logs for support (calamares "Upload" button).
+uploadServer:
+    type:      "fiche"
+    url:       "http://termbin.com:9999"
+    sizeLimit: -1

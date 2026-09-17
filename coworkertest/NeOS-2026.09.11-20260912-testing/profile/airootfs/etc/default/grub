@@ -1,0 +1,26 @@
+# NeOS GRUB defaults for boot reliability on common storage and VM targets.
+
+GRUB_DEFAULT=0
+GRUB_TIMEOUT=1
+GRUB_DISTRIBUTOR="NeOS"
+# Performance Optimizations
+# - nowatchdog: Disable watchdog timer to reduce CPU interrupts
+# - intel_pstate=enable: Force Intel P-state driver (if valid/supported)
+# - amd_pstate=active: Enable AMD P-state active mode for modern Ryzen CPUs
+GRUB_CMDLINE_LINUX_DEFAULT="quiet splash nowatchdog intel_pstate=enable amd_pstate=active"
+GRUB_CMDLINE_LINUX=""
+
+# Preload modules to improve bootloader startup reliability across filesystems.
+# Keep this list conservative to avoid unnecessary probes on unsupported media.
+GRUB_PRELOAD_MODULES="part_gpt part_msdos ext2 btrfs"
+
+# Disable submenus for a simpler boot menu experience.
+GRUB_DISABLE_SUBMENU=true
+
+# Use the classic Arch 'starfield' GRUB theme, which ships natively with the
+# grub package at this path on the installed system — no overlay shipping or
+# generated font is needed. grub-mkconfig auto-loads the theme's bundled DejaVu
+# fonts, so GRUB_FONT is intentionally unset. Matches the ISO boot menu.
+GRUB_THEME="/usr/share/grub/themes/starfield/theme.txt"
+GRUB_GFXMODE="auto"
+GRUB_TERMINAL_OUTPUT="gfxterm"

@@ -1,0 +1,27 @@
+[Unit]
+Description=NeOS Driver Manager
+After=network.target
+
+[Service]
+Type=oneshot
+# Set LC_ALL=C to eliminate locale-aware string parsing overhead in bash scripts
+Environment=LC_ALL=C
+ExecStart=/usr/local/bin/neos-driver-manager
+# Sentinel: Hardened systemd sandboxing
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+NoNewPrivileges=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=no
+ProtectControlGroups=yes
+ProtectHostname=yes
+RestrictRealtime=yes
+RestrictNamespaces=yes
+MemoryDenyWriteExecute=yes
+LockPersonality=yes
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+CapabilityBoundingSet=CAP_SYS_MODULE CAP_SYS_ADMIN
+
+[Install]
+WantedBy=multi-user.target

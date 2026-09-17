@@ -1,0 +1,87 @@
+# Compiled and build artifacts
+*.pyc
+__pycache__/
+*.o
+*.obj
+*.class
+*.exe
+*.dll
+*.so
+*.a
+*.out
+
+# Dependencies
+.venv/
+venv/
+node_modules/
+target/
+.gradle/
+.mypy_cache/
+.pytest_cache/
+
+# .NET build artifacts (tools/NeosDiagnostics)
+bin/
+obj/
+*.user
+
+# Logs and temp files
+*.log
+*.tmp
+*.swp
+*.swo
+*~
+
+# Environment
+.env
+.env.local
+.env.*
+
+# Editors
+.vscode/
+.idea/
+
+# Build and distribution
+dist/
+build/
+coverage/
+htmlcov/
+*.tar
+*.gz
+*.zip
+*.bz2
+*.xz
+*.7z
+*.rar
+*.zst
+*.lz4
+*.lzh
+*.cab
+*.arj
+*.rpm
+*.deb
+*.Z
+*.lz
+*.lzo
+*.tar.gz
+*.tar.bz2
+*.tar.xz
+*.tar.zst
+*.iso
+
+# System files
+.DS_Store
+Thumbs.db
+
+# archiso build artifacts
+work/
+out/
+pacman-build.conf
+
+# Architect: CI/CD test hardening specific
+tests/*.log
+
+# CodeGraph local index (machine-specific)
+.codegraph/
+
+# graphify local knowledge-graph output (per-user, not part of the OS)
+graphify-out/

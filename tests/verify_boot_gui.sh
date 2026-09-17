@@ -7,9 +7,8 @@
 #   graphical.target so it boots into SDDM/Plasma.
 # - Boot splash: the Plymouth 'neos' theme shows ONLY a single still cat-00.png
 #   loader image, dead centre — no wordmark, no tagline, no dots, no status
-#   text, no animation. The cat-NN.png frame set is generated from
-#   tools/loader-cat.gif (committed; CI does not run generators) and kept as
-#   source material even though only frame 00 is wired into the script.
+#   text, no animation. Only cat-00.png is shipped; the remaining 28 frames
+#   have been removed as dead assets (only frame 00 is wired into the script).
 # - No KDE splash: ksplash after SDDM login is disabled via skel ksplashrc so
 #   the Plymouth cat is the only boot screen.
 set -euo pipefail
@@ -47,10 +46,10 @@ fi
 # 2. Boot-splash cat source frames are present (29 frames) and cat-00 is
 #    wired into the script as the single still image.
 frames=$(find "$THEME_DIR" -maxdepth 1 -name 'cat-*.png' | wc -l)
-if [[ "$frames" -eq 29 ]]; then
-    echo "PASS: 29 cat source frames present"
+if [[ "$frames" -eq 1 ]]; then
+    echo "PASS: single static cat-00.png frame present (animation frames removed)"
 else
-    echo "[FAIL] expected 29 cat-NN.png frames, found $frames"; FAIL=1
+    echo "[FAIL] expected 1 cat-00.png frame, found $frames"; FAIL=1
 fi
 if [[ "$SCRIPT_CONTENT" == *'"cat-00.png"'* ]]; then
     echo "PASS: neos.script shows the still cat-00 frame"

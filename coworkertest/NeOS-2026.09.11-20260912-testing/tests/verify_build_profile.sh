@@ -1,0 +1,119 @@
+#!/bin/bash
+set -e
+
+PROFILE_FILE="profile/profiledef.sh"
+WORKFLOW_FILE=".github/workflows/build-iso.yml"
+
+echo "Verifying mkarchiso build profile configuration..."
+
+# Verify workflow YAML is valid (prevents broken CI from heredoc/YAML conflicts)
+if [[ -f "$WORKFLOW_FILE" ]]; then
+    if python3 -c "import yaml" 2>/dev/null; then
+        # Palette: Verify developers find YAML parsing errors readable and formatting of these errors is clean.
+        # Capture the error output to display it clearly
+        if ERR_MSG=$(python3 -c "
+import yaml, sys
+try:
+    with open('$WORKFLOW_FILE') as f:
+        yaml.safe_load(f)
+except Exception as e:
+    print(e, file=sys.stderr)
+    sys.exit(1)
+" 2>&1); then
+            echo "  [PASS] $WORKFLOW_FILE is valid YAML"
+        else
+            echo -e "$ERR_MSG" >&2
+            echo "[FAIL] $WORKFLOW_FILE has YAML syntax errors (CI will fail with 0 jobs)"
+            echo ""
+            echo "How to fix:"
+            echo "   - Review $WORKFLOW_FILE for indentation errors."
+            echo "   - Ensure strings are properly quoted and lists are formatted correctly."
+            exit 1
+        fi
+    else
+        echo "[WARN] PyYAML not installed, skipping YAML syntax check"
+    fi
+fi
+
+# Verify profiledef.sh exists
+if [[ ! -f "$PROFILE_FILE" ]]; then
+    echo "[FAIL] Missing $PROFILE_FILE"
+    echo ""
+    echo "[INFO] How to fix:"
+    echo "   - Ensure $PROFILE_FILE exists in the profile/ directory."
+    echo "   - Check if you are running this script from the correct directory."
+    exit 1
+fi
+
+# Verify packages file exists for x86_64
+if [[ -f "profile/packages.x86_64" ]]; then
+    echo "[PASS] profile/packages.x86_64 exists"
+else
+    echo "[FAIL] profile/packages.x86_64 does not exist"
+    echo ""
+    echo "[INFO] How to fix:"
+    echo "   - Create the packages.x86_64 file in profile/."
+    echo "   - Ensure it contains a list of packages to install on the x86_64 architecture."
+    exit 1
+fi
+
+# Verify bootstrap_packages exists (required by newer archiso)
+if [[ -f "profile/bootstrap_packages.x86_64" ]]; then
+    echo "[PASS] profile/bootstrap_packages.x86_64 file exists"
+else
+    echo "[FAIL] profile/bootstrap_packages.x86_64 file does not exist"
+    echo ""
+    echo "[INFO] How to fix:"
+    echo "   - Create the bootstrap_packages.x86_64 file in profile/."
+    echo "   - This file is required by mkarchiso to bootstrap the base system."
+    exit 1
+fi
+
+# Verify grub/grub.cfg exists (required for uefi.grub boot mode)
+PROFILE_CONTENT=$(<"$PROFILE_FILE")
+if [[ "$PROFILE_CONTENT" == *"uefi.grub"* ]]; then
+    if [[ -f "profile/grub/grub.cfg" ]]; then
+        echo "  [PASS] profile/grub/grub.cfg exists (required for uefi.grub)"
+    else
+        echo "[FAIL] profile/grub/grub.cfg missing (required for uefi.grub boot mode)"
+        echo ""
+        echo "[INFO] How to fix:"
+        echo "   - Provide profile/grub/grub.cfg if you plan to support uefi.grub boot mode."
+        echo "   - Remove 'uefi.grub' from bootmodes in $PROFILE_FILE if you do not."
+        exit 1
+    fi
+fi
+
+echo "Build profile configuration checks passed."
+
+# Verify pacman.conf configuration for build environment
+if [[ -f "profile/pacman.conf" ]]; then
+    # Bolt: Replace subprocess grep with native bash logic or read file lines if performance overhead becomes a concern during parallel validation.
+    # Sentinel: The root pacman.conf requires 'DatabaseOptional' to unblock the build process for unsigned repos. Ensure this does not inadvertently leak to the installed system.
+    CONTENT=$(<"profile/pacman.conf")
+    regex=$'(^|\n)[[:space:]]*SigLevel[[:space:]]*=[^\n]*DatabaseRequired'
+    if [[ "$CONTENT" =~ $regex ]]; then
+        has_db_req=true
+    else
+        has_db_req=false
+    fi
+    if $has_db_req; then
+        # Format error outputs clearly with multiline 'How to fix:' sections to assist developers when CI fails.
+        echo "[FAIL] pacman.conf contains build-blocking 'DatabaseRequired' setting."
+        echo ""
+        echo "[INFO] How to fix:"
+        echo "   - Modify the global 'SigLevel' in 'profile/pacman.conf' to 'Required DatabaseOptional'."
+        echo "   - Ensure that the installed system config (profile/airootfs/etc/pacman.conf) explicitly enforces 'DatabaseRequired'."
+        exit 1
+    else
+        echo "  [PASS] pacman.conf is correctly configured for the build environment (no global DatabaseRequired)."
+    fi
+else
+    echo "[FAIL] profile/pacman.conf missing"
+    echo ""
+    echo "[INFO] How to fix:"
+    echo "   - Ensure pacman.conf exists in the profile/ directory."
+    echo "   - This file is required to configure the build environment packages."
+    exit 1
+fi
+

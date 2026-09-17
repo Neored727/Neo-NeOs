@@ -1,0 +1,47 @@
+# Labeler config — actions/labeler v5+ schema (changed-files / any-glob-to-any-file).
+
+# Add 'core' label to any changes within 'airootfs' directory
+core:
+- changed-files:
+  - any-glob-to-any-file: 'profile/airootfs/**/*'
+
+# Add 'packages' label to changes in package lists
+packages:
+- changed-files:
+  - any-glob-to-any-file:
+    - 'profile/packages.*'
+    - 'profile/bootstrap_packages.*'
+
+# Add 'config' label to changes in profiledef.sh or pacman.conf
+config:
+- changed-files:
+  - any-glob-to-any-file:
+    - 'profile/profiledef.sh'
+    - 'profile/pacman.conf'
+
+# Add 'boot' label to changes in bootloader configurations
+boot:
+- changed-files:
+  - any-glob-to-any-file:
+    - 'profile/syslinux/**/*'
+    - 'profile/grub/**/*'
+
+# Add 'documentation' label to changes in docs or markdown files
+documentation:
+- changed-files:
+  - any-glob-to-any-file:
+    - 'docs/**/*'
+    - '*.md'
+
+# Add 'ci' label to changes in .github directory
+ci:
+- changed-files:
+  - any-glob-to-any-file: '.github/**/*'
+
+# Add 'scripts' label to changes in build scripts
+scripts:
+- changed-files:
+  - any-glob-to-any-file:
+    - 'build.sh'
+    - 'tests/**/*'
+    - 'tools/**/*'

@@ -1,0 +1,33 @@
+#!/bin/bash
+set -euo pipefail
+
+echo "Verifying UFW configuration..."
+
+# Check ufw.conf
+if [[ -f "profile/airootfs/etc/ufw/ufw.conf" ]]; then
+    if grep -q "ENABLED=yes" "profile/airootfs/etc/ufw/ufw.conf"; then
+        echo "  [PASS] ufw.conf has ENABLED=yes"
+    else
+        echo "[FAIL] ufw.conf does not have ENABLED=yes"
+        exit 1
+    fi
+else
+    echo "[FAIL] profile/airootfs/etc/ufw/ufw.conf not found"
+    exit 1
+fi
+
+# Check systemd symlink
+if [[ -L "profile/airootfs/etc/systemd/system/multi-user.target.wants/ufw.service" ]]; then
+    TARGET=$(readlink "profile/airootfs/etc/systemd/system/multi-user.target.wants/ufw.service")
+    if [[ "$TARGET" == "/usr/lib/systemd/system/ufw.service" ]]; then
+        echo "  [PASS] ufw.service symlink is correct"
+    else
+        echo "[FAIL] ufw.service symlink points to wrong target: $TARGET"
+        exit 1
+    fi
+else
+    echo "[FAIL] ufw.service symlink not found"
+    exit 1
+fi
+
+echo "UFW verification passed!"
